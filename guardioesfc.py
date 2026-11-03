@@ -108,22 +108,66 @@ def criar_moradores():
         ["Beatriz", 0, 80, True, False],
     ]
 
+# ================== FUNÇÕES ======================
+def ler_inteiro(mensagem, minimo, maximo):
+    """Pede um número inteiro até ele ser válido e estar na faixa."""
+    while True:
+        entrada = input(mensagem).strip()
+        if not entrada.isdigit() or not entrada.isascii():
+            print(f"  Valor inválido. Digite um número inteiro "
+                  f"de {minimo} a {maximo}.")
+            continue
+        valor = int(entrada)
+        if valor < minimo or valor > maximo:
+            print(f"  Fora da faixa permitida ({minimo} a {maximo}). "
+                  f"Tente de novo.")
+            continue
+        return valor
+
+
+def ler_texto(mensagem, tamanho_minimo):
+    """Pede um texto só com letras e espaços, com tamanho mínimo."""
+    while True:
+        texto = input(mensagem).strip()
+        sem_espacos = texto.replace(" ", "")
+        if len(sem_espacos) < tamanho_minimo:
+            print(f"  Digite pelo menos {tamanho_minimo} letras.")
+        elif not sem_espacos.isalpha():
+            print("  Use apenas letras e espaços.")
+        else:
+            return texto.title()
+
+  
+def ler_sim_nao(mensagem):
+    """Pede uma resposta S/N e devolve True para sim, False para não."""
+    while True:
+        resposta = input(mensagem).strip().lower()
+        if resposta in ["s", "sim"]:
+            return True
+        if resposta in ["n", "nao", "não"]:
+            return False
+        print("  Responda com S (sim) ou N (não).")
+
+        
+
+
 def main():
     chuvas = criar_matriz_chuvas()
     moradores = criar_moradores()
 
     print("==== Bem-vindo ao Guardiões JF ====")
 
-    print(f"Bairros monitorados: {len(BAIRROS)}")
-    print(f"Moradores cadastrados: {len(moradores)}")
-    print(f"Missões disponíveis: {len(MISSOES)}")
+    # print(f"Bairros monitorados: {len(BAIRROS)}")
+    # print(f"Moradores cadastrados: {len(moradores)}")
+    # print(f"Missões disponíveis: {len(MISSOES)}")
+     # Teste temporário das funções de validação
+    chuva = ler_inteiro("Chuva nas últimas 24 h (0 a 500 mm): ", 0, 500)
+    nome = ler_texto("Nome do morador: ", 2)
+    tem_celular = ler_sim_nao("Tem smartphone? (S/N): ")
 
-    # Teste rápido: acessando a matriz por [linha][coluna]
-    print(f"Chuva no {BAIRROS[0]} na {DIAS_SEMANA[2]}: "
-          f"{chuvas[0][2]} mm")
-    print(f"Primeiro morador: {moradores[0][NOME]}, "
-          f"{moradores[0][PONTOS]} pontos")
+    print(f"\nChuva: {chuva} mm | Nome: {nome} | Celular: {tem_celular}")
+    print(f"(Dados carregados: {len(chuvas)} bairros na matriz, "
+          f"{len(moradores)} moradores)")
 
-# Boa Prática. faz o main() rodar só quando vocês executam o arquivo diretamente.
 if __name__ == "__main__":
     main()
