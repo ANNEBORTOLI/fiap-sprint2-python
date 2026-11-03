@@ -16,6 +16,9 @@ NIVEL_ATENCAO = 120
 NIVEL_ALERTA = 200
 NIVEL_EMERGENCIA = 300
 
+# Acumulado da semana a partir do qual o solo é tratado como encharcado.
+ACUMULADO_SOLO_ENCHARCADO = 150
+
 # Bairros de Juiz de Fora.
 BAIRROS = [
     "Parque Burnier",
@@ -178,6 +181,20 @@ def contar_moradores_bairro(moradores, indice_bairro):
             sem_celular += 1
     return com_celular, sem_celular
 
+
+def calcular_estatisticas(valores):
+    """Devolve total, média, maior e menor de uma lista de números."""
+    total = 0
+    maior = valores[0]
+    menor = valores[0]
+    for valor in valores:
+        total += valor
+        if valor > maior:
+            maior = valor
+        if valor < menor:
+            menor = valor
+    media = total / len(valores)
+    return total, media, maior, menor
 # =====================================================================
 # REGRAS DE NEGÓCIO
 # =====================================================================
@@ -240,7 +257,6 @@ def exibir_cartao_alerta(indice_bairro, chuva_mm, nivel_cm, indice_risco):
 # =====================================================================
 # FUNCIONALIDADES DO MENU
 # =====================================================================
-
 def registrar_leitura(chuvas, niveis_agua, riscos, moradores):
     """Opção 1: registra uma leitura, classifica o risco e mostra o
     alerta com orientação. Devolve o nível de risco calculado."""
@@ -277,6 +293,75 @@ def registrar_leitura(chuvas, niveis_agua, riscos, moradores):
               f"ligação de voz.")
     return risco_novo
 
+
+def relatorio_chuvas(chuvas):
+    """Opção 2: percorre a matriz e mostra totais, médias, maior e
+    menor valor por bairro, além do dia mais chuvoso."""
+    print("\n" + "=" * 62)
+    print(" RELATÓRIO DE CHUVAS DA SEMANA (mm)")
+    print("=" * 62)
+
+    # Cabeçalho da tabela
+    cabecalho = f"{'Bairro':<16}"
+    for dia in DIAS_SEMANA:
+        cabecalho += f"{dia:>5}"
+    cabecalho += f"{'Total':>7}{'Média':>7}{'Maior':>7}{'Menor':>7}"
+    print(cabecalho)
+    print("-" * len(cabecalho))
+
+    # Uma linha da tabela para cada linha da matriz (bairro)
+    totais_bairros = []
+    for i in range(len(BAIRROS)):
+        linha = f"{BAIRROS[i]:<16}"
+        for valor in chuvas[i]:
+            linha += f"{valor:>5}"
+        total, media, maior, menor = calcular_estatisticas(chuvas[i])
+        totais_bairros.append(total)
+        linha += f"{total:>7}{media:>7.1f}{maior:>7}{menor:>7}"
+        print(linha)
+
+    # Soma de cada coluna (dia) da matriz
+    totais_dias = []
+    for j in range(len(DIAS_SEMANA)):
+        soma_dia = 0
+        for i in range(len(BAIRROS)):
+            soma_dia += chuvas[i][j]
+        totais_dias.append(soma_dia)
+
+    # Dia com a maior soma de chuva
+    indice_dia = 0
+    for j in range(len(totais_dias)):
+        if totais_dias[j] > totais_dias[indice_dia]:
+            indice_dia = j
+
+    # Estatísticas dos bairros
+    total_geral, media_bairro, maior_total, menor_total = (
+        calcular_estatisticas(totais_bairros))
+    indice_mais = totais_bairros.index(maior_total)
+    indice_menos = totais_bairros.index(menor_total)
+
+    print("\nResumo:")
+    print(f"  Chuva somada de todos os bairros: {total_geral} mm")
+    print(f"  Média por bairro na semana: {media_bairro:.1f} mm")
+    print(f"  Maior acumulado: {BAIRROS[indice_mais]} "
+          f"({maior_total} mm)")
+    print(f"  Menor acumulado: {BAIRROS[indice_menos]} "
+          f"({menor_total} mm)")
+    print(f"  Dia mais chuvoso: {DIAS_SEMANA[indice_dia]} "
+          f"({totais_dias[indice_dia]} mm somando os bairros)")
+
+    # Solo encharcado aumenta o risco de deslizamento
+    print(f"\nBairros com solo encharcado "
+          f"(acumulado >= {ACUMULADO_SOLO_ENCHARCADO} mm):")
+    encontrou = False
+    for i in range(len(BAIRROS)):
+        if totais_bairros[i] < ACUMULADO_SOLO_ENCHARCADO:
+            continue   # abaixo do limite: pula para o próximo bairro
+        encontrou = True
+        print(f"  - {BAIRROS[i]}: {totais_bairros[i]} mm. "
+              f"Atenção redobrada a encostas.")
+    if not encontrou:
+        print("  Nenhum bairro acima do limite nesta semana.")
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -309,7 +394,7 @@ def main():
             case 1:
                 registrar_leitura(chuvas, niveis_agua, riscos, moradores)
             case 2:
-                print("\nRelatório de chuvas")
+                relatorio_chuvas(chuvas)
             case 3:
                 print("\nConsultar abrigo")
             case 4:

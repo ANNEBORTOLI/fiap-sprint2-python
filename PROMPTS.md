@@ -11,3 +11,5 @@
 6. Meu código está ficando muito desorganizado, me ajude a organizar criando
    comentários.Não crie outros arquivos. Apenas observe o que está no guardioesfc.py
    e me diga como posso organizar melhor.
+7. Preciso criar uma tabela a partir da função abaixo que faz a leitura de matrizes.
+   Me ajude a deixar visivelmente atraente para o leitor.
