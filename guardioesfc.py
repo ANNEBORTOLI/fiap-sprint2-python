@@ -1,4 +1,6 @@
+# =====================================================================
 # CONSTANTES DO PROGRAMA
+# =====================================================================
 # Níveis de risco. A posição na lista funciona como código do nível: 0 a 3.
 NIVEIS_RISCO = ["NORMAL", "ATENÇÃO", "ALERTA", "EMERGÊNCIA"]
 NORMAL = 0
@@ -75,7 +77,9 @@ PONTOS = 2
 TEM_CELULAR = 3
 CONFIRMOU = 4
 
-# Criando os dados para rodar o programa
+# =====================================================================
+# CRIAÇÃO DOS DADOS INICIAIS
+# =====================================================================
 def criar_matriz_chuvas():
     """Devolve a matriz bairros x dias com chuva (mm) já cadastrada.
     Linha = bairro (mesma ordem de BAIRROS)
@@ -107,7 +111,9 @@ def criar_moradores():
         ["Beatriz", 0, 80, True, False],
     ]
 
-# ================== FUNÇÕES DO PROGRAMA ======================
+# =====================================================================
+# FUNÇÕES DE ENTRADA (VALIDAÇÃO DOS INPUTS)
+# =====================================================================
 def ler_inteiro(mensagem, minimo, maximo):
     """Pede um número inteiro até ele ser válido e estar na faixa."""
     while True:
@@ -136,7 +142,7 @@ def ler_texto(mensagem, tamanho_minimo):
         else:
             return texto.title()
 
-  
+
 def ler_sim_nao(mensagem):
     """Pede uma resposta S/N e devolve True para sim, False para não."""
     while True:
@@ -147,7 +153,133 @@ def ler_sim_nao(mensagem):
             return False
         print("  Responda com S (sim) ou N (não).")
 
-        
+# =====================================================================
+# FUNÇÕES AUXILIARES
+# =====================================================================
+
+def escolher_bairro(bairros):
+    """Lista os bairros numerados e devolve o índice escolhido."""
+    for i in range(len(bairros)):
+        print(f"  {i + 1}. {bairros[i]}")
+    opcao = ler_inteiro("Número do bairro: ", 1, len(bairros))
+    return opcao - 1
+
+
+def contar_moradores_bairro(moradores, indice_bairro):
+    """Conta quantos moradores do bairro têm e não têm celular."""
+    com_celular = 0
+    sem_celular = 0
+    for morador in moradores:
+        if morador[BAIRRO] != indice_bairro:
+            continue   # morador de outro bairro: pula
+        if morador[TEM_CELULAR]:
+            com_celular += 1
+        else:
+            sem_celular += 1
+    return com_celular, sem_celular
+
+# =====================================================================
+# REGRAS DE NEGÓCIO
+# =====================================================================
+
+def classificar_risco(chuva_mm, nivel_cm):
+    """Classifica o risco a partir da chuva (mm/24 h) e do nível da
+    água (cm). Vale o pior dos dois indicadores. Devolve 0 a 3."""
+    if chuva_mm >= CHUVA_EMERGENCIA or nivel_cm >= NIVEL_EMERGENCIA:
+        return EMERGENCIA
+    elif chuva_mm >= CHUVA_ALERTA or nivel_cm >= NIVEL_ALERTA:
+        return ALERTA
+    elif chuva_mm >= CHUVA_ATENCAO or nivel_cm >= NIVEL_ATENCAO:
+        return ATENCAO
+    else:
+        return NORMAL
+
+
+def obter_orientacao(indice_risco):
+    """Devolve a lista de passos de "O que fazer agora" para o nível."""
+    match indice_risco:
+        case 0:
+            return ["Sem risco no momento.",
+                    "Aproveite para conferir a rota até o seu abrigo."]
+        case 1:
+            return ["Fique atento aos próximos avisos oficiais.",
+                    "Separe documentos, remédios e lanterna.",
+                    "Desconfie de mensagens que não sejam da "
+                    "Defesa Civil."]
+        case 2:
+            return ["Saia da encosta e vá para o abrigo indicado.",
+                    "Não atravesse ruas alagadas, nem a pé nem de carro.",
+                    "Avise um vizinho que não tem celular."]
+        case 3:
+            return ["Saia AGORA para o abrigo indicado.",
+                    "Se não conseguir sair, vá para o ponto mais alto "
+                    "e ligue 199 (Defesa Civil) ou 193 (Bombeiros).",
+                    "Não volte para buscar objetos."]
+        case _:
+            return ["Nível de risco desconhecido."]
+
+
+def exibir_cartao_alerta(indice_bairro, chuva_mm, nivel_cm, indice_risco):
+    """Mostra o cartão de alerta: nível, o que fazer agora, abrigo e 
+    rua a evitar."""
+    print("\n" + "-" * 62)
+    print(f" {NIVEIS_RISCO[indice_risco]}  |  {BAIRROS[indice_bairro]}")
+    print("-" * 62)
+    print(f" Chuva em 24 h: {chuva_mm} mm   |   "
+          f"Nível da água: {nivel_cm} cm")
+    print("\n O que fazer agora:")
+    passos = obter_orientacao(indice_risco)
+    for numero in range(len(passos)):
+        print(f"   {numero + 1}. {passos[numero]}")
+    print(f"\n Abrigo mais próximo: {ABRIGOS[indice_bairro]}, "
+          f"{DISTANCIAS_ABRIGO_M[indice_bairro]} m")
+    if indice_risco >= ALERTA:
+        print(f" Evite: {RUAS_EVITAR[indice_bairro]}")
+    print("-" * 62)
+
+# =====================================================================
+# FUNCIONALIDADES DO MENU
+# =====================================================================
+
+def registrar_leitura(chuvas, niveis_agua, riscos, moradores):
+    """Opção 1: registra uma leitura, classifica o risco e mostra o
+    alerta com orientação. Devolve o nível de risco calculado."""
+    print("\n" + "=" * 62)
+    print(" REGISTRAR LEITURA E CLASSIFICAR RISCO")
+    print("=" * 62)
+    indice_bairro = escolher_bairro(BAIRROS)
+
+    print("\nDia da leitura:")
+    for i in range(len(DIAS_SEMANA)):
+        print(f"  {i + 1}. {DIAS_SEMANA[i]}")
+    indice_dia = ler_inteiro("Número do dia: ", 1, len(DIAS_SEMANA)) - 1
+
+    chuva = ler_inteiro("Chuva nas últimas 24 h (0 a 500 mm): ", 0, 500)
+    nivel = ler_inteiro("Nível da água do córrego (0 a 1000 cm): ",
+                        0, 1000)
+
+    risco_novo = classificar_risco(chuva, nivel)
+
+    # Guarda os dados: a chuva vai para a matriz (bairro x dia).
+    chuvas[indice_bairro][indice_dia] = chuva
+    niveis_agua[indice_bairro] = nivel
+    riscos[indice_bairro] = risco_novo
+
+    exibir_cartao_alerta(indice_bairro, chuva, nivel, risco_novo)
+
+    # Alerta multicanal: quem não tem smartphone recebe ligação de voz.
+    if risco_novo >= ATENCAO:
+        com_celular, sem_celular = contar_moradores_bairro(
+            moradores, indice_bairro)
+        print(f" Aviso enviado a {com_celular + sem_celular} morador(es)"
+              f" cadastrado(s):")
+        print(f"   {com_celular} por push/SMS e {sem_celular} por "
+              f"ligação de voz.")
+    return risco_novo
+
+# =====================================================================
+# MENU PRINCIPAL
+# =====================================================================
 def exibir_menu():
     """Mostra as opções do menu principal."""
     print("Guardiões JF - Juiz de Fora/MG")
@@ -161,9 +293,13 @@ def exibir_menu():
     print("  8. Painel da Defesa Civil")
     print("  0. Sair")
 
+
 def main():
+    """Cria os dados e mantém o menu rodando até o usuário sair."""
     chuvas = criar_matriz_chuvas()
     moradores = criar_moradores()
+    niveis_agua = [80, 60, 90, 50, 70, 40, 85, 45]   # cm, simulado
+    riscos = [NORMAL] * len(BAIRROS)
 
     executando = True
     while executando:
@@ -171,7 +307,7 @@ def main():
         opcao = ler_inteiro("Escolha uma opção: ", 0, 8)
         match opcao:
             case 1:
-                print("\nRegistrar leitura")
+                registrar_leitura(chuvas, niveis_agua, riscos, moradores)
             case 2:
                 print("\nRelatório de chuvas")
             case 3:

@@ -8,3 +8,6 @@
 4. Crie uma lista com nomes de ruas que tenha 8 posições.
 5. Como posso garantir que apenas inteiros sejam digitados, me mostre todas as
    possibilidades além do isdigit().
+6. Meu código está ficando muito desorganizado, me ajude a organizar criando
+   comentários.Não crie outros arquivos. Apenas observe o que está no guardioesfc.py
+   e me diga como posso organizar melhor.
