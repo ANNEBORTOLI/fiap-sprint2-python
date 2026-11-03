@@ -156,6 +156,10 @@ def ler_sim_nao(mensagem):
             return False
         print("  Responda com S (sim) ou N (não).")
 
+
+def pausar():
+    """Espera o usuário apertar Enter antes de voltar ao menu."""
+    input("\nPressione Enter para voltar ao menu...")
 # =====================================================================
 # FUNÇÕES AUXILIARES
 # =====================================================================
@@ -410,6 +414,9 @@ def main():
             case 0:
                 executando = False
                 print("\nAté logo! Prevenção é hábito coletivo.")
-
+          
+        if executando:        
+          pausar()
+          
 if __name__ == "__main__":
     main()

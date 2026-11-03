@@ -13,3 +13,5 @@
    e me diga como posso organizar melhor.
 7. Preciso criar uma tabela a partir da função abaixo que faz a leitura de matrizes.
    Me ajude a deixar visivelmente atraente para o leitor.
+8. Onde posso modificar meu código para que o menu não fique colado com os retornos
+   do match.
