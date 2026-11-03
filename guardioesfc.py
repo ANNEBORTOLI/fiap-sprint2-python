@@ -1,5 +1,4 @@
 # CONSTANTES DO PROGRAMA
-
 # Níveis de risco. A posição na lista funciona como código do nível: 0 a 3.
 NIVEIS_RISCO = ["NORMAL", "ATENÇÃO", "ALERTA", "EMERGÊNCIA"]
 NORMAL = 0
@@ -108,7 +107,7 @@ def criar_moradores():
         ["Beatriz", 0, 80, True, False],
     ]
 
-# ================== FUNÇÕES ======================
+# ================== FUNÇÕES DO PROGRAMA ======================
 def ler_inteiro(mensagem, minimo, maximo):
     """Pede um número inteiro até ele ser válido e estar na faixa."""
     while True:
@@ -149,25 +148,47 @@ def ler_sim_nao(mensagem):
         print("  Responda com S (sim) ou N (não).")
 
         
-
+def exibir_menu():
+    """Mostra as opções do menu principal."""
+    print("Guardiões JF - Juiz de Fora/MG")
+    print("  1. Registrar leitura e classificar risco do bairro")
+    print("  2. Relatório de chuvas da semana")
+    print("  3. Consultar abrigo do meu bairro")
+    print("  4. Cadastrar morador")
+    print("  5. Registrar missão de prevenção")
+    print("  6. Ranking comunitário")
+    print("  7. Confirmar que estou em segurança")
+    print("  8. Painel da Defesa Civil")
+    print("  0. Sair")
 
 def main():
     chuvas = criar_matriz_chuvas()
     moradores = criar_moradores()
 
-    print("==== Bem-vindo ao Guardiões JF ====")
-
-    # print(f"Bairros monitorados: {len(BAIRROS)}")
-    # print(f"Moradores cadastrados: {len(moradores)}")
-    # print(f"Missões disponíveis: {len(MISSOES)}")
-     # Teste temporário das funções de validação
-    chuva = ler_inteiro("Chuva nas últimas 24 h (0 a 500 mm): ", 0, 500)
-    nome = ler_texto("Nome do morador: ", 2)
-    tem_celular = ler_sim_nao("Tem smartphone? (S/N): ")
-
-    print(f"\nChuva: {chuva} mm | Nome: {nome} | Celular: {tem_celular}")
-    print(f"(Dados carregados: {len(chuvas)} bairros na matriz, "
-          f"{len(moradores)} moradores)")
+    executando = True
+    while executando:
+        exibir_menu()
+        opcao = ler_inteiro("Escolha uma opção: ", 0, 8)
+        match opcao:
+            case 1:
+                print("\nRegistrar leitura")
+            case 2:
+                print("\nRelatório de chuvas")
+            case 3:
+                print("\nConsultar abrigo")
+            case 4:
+                print("\nCadastrar morador")
+            case 5:
+                print("\nRegistrar missão")
+            case 6:
+                print("\nRanking comunitário")
+            case 7:
+                print("\nConfirmar segurança")
+            case 8:
+                print("\nPainel da Defesa Civil")
+            case 0:
+                executando = False
+                print("\nAté logo! Prevenção é hábito coletivo.")
 
 if __name__ == "__main__":
     main()

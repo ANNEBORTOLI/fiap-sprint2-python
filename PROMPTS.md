@@ -6,3 +6,5 @@
 3. Com base em dados públicos de chuvas, crie um ranking para níveis de atenção,
    alerta e emergência.
 4. Crie uma lista com nomes de ruas que tenha 8 posições.
+5. Como posso garantir que apenas inteiros sejam digitados, me mostre todas as
+   possibilidades além do isdigit().
