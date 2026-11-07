@@ -210,6 +210,16 @@ def buscar_morador(moradores, nome):
             indice_encontrado = i
             break   # achou: não precisa olhar o resto da lista
     return indice_encontrado
+
+
+def escolher_morador(moradores, bairros):
+    """Lista os moradores numerados e devolve o índice escolhido."""
+    for i in range(len(moradores)):
+        morador = moradores[i]
+        print(f"  {i + 1}. {morador[NOME]:<14} "
+              f"({bairros[morador[BAIRRO]]})")
+    opcao = ler_inteiro("Número do morador: ", 1, len(moradores))
+    return opcao - 1
 # =====================================================================
 # REGRAS DE NEGÓCIO
 # =====================================================================
@@ -425,6 +435,32 @@ def cadastrar_morador(moradores):
     print(f"\n {nome} cadastrado(a) em {BAIRROS[indice_bairro]}.")
     print(f" Canal de alerta: {canal}.")
     print(f" Total de moradores cadastrados: {len(moradores)}")
+
+
+def registrar_missao(moradores):
+    """Opção 5: registra uma missão de prevenção e soma os pontos.
+    Devolve o novo total de pontos do morador."""
+    print("\n" + "=" * 62)
+    print(" REGISTRAR MISSÃO DE PREVENÇÃO")
+    print("=" * 62)
+    print("Quem cumpriu a missão?")
+    indice_morador = escolher_morador(moradores, BAIRROS)
+
+    print("\nMissões disponíveis:")
+    for i in range(len(MISSOES)):
+        print(f"  {i + 1}. {MISSOES[i][0]} (+{MISSOES[i][1]} pontos)")
+        print(f"     Por quê: {MISSOES[i][2]}")
+    indice_missao = ler_inteiro("Número da missão: ", 1, len(MISSOES)) - 1
+
+    # Soma os pontos da missão ao total do morador
+    morador = moradores[indice_morador]
+    pontos_missao = MISSOES[indice_missao][1]
+    morador[PONTOS] += pontos_missao
+
+    print(f"\n Missão registrada: {MISSOES[indice_missao][0]}")
+    print(f" {morador[NOME]} ganhou +{pontos_missao} pontos. "
+          f"Total: {morador[PONTOS]} pontos.")
+    return morador[PONTOS]
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -463,7 +499,7 @@ def main():
             case 4:
                 cadastrar_morador(moradores)
             case 5:
-                print("\nRegistrar missão")
+                registrar_missao(moradores)
             case 6:
                 print("\nRanking comunitário")
             case 7:
