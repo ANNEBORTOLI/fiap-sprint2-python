@@ -236,6 +236,15 @@ def ordenar_ranking(itens):
         itens[i] = itens[indice_maior]
         itens[indice_maior] = temporario
     return itens
+
+
+def bairros_em_alerta(riscos):
+    """Devolve a lista de índices dos bairros em ALERTA ou EMERGÊNCIA."""
+    lista = []
+    for i in range(len(riscos)):
+        if riscos[i] >= ALERTA:
+            lista.append(i)
+    return lista
 # =====================================================================
 # REGRAS DE NEGÓCIO
 # =====================================================================
@@ -553,6 +562,51 @@ def confirmar_seguranca(moradores, riscos):
           f"{ABRIGOS[morador[BAIRRO]]}.")
     print(" O painel da Defesa Civil foi atualizado.")
     return True
+
+
+def painel_evacuacao(moradores, riscos):
+    """Opção 8: painel da Defesa Civil. Mostra o risco de cada bairro
+    e, nos bairros em evacuação, quem já confirmou e quem falta."""
+    print("\n" + "=" * 62)
+    print(" PAINEL DA DEFESA CIVIL")
+    print("=" * 62)
+    print(f"{'Bairro':<16}{'Risco':<14}{'Confirmados':>12}")
+    print("-" * 42)
+
+    # Uma linha por bairro, com a contagem de confirmações
+    for i in range(len(BAIRROS)):
+        confirmados = 0
+        total = 0
+        for morador in moradores:
+            if morador[BAIRRO] == i:
+                total += 1
+                if morador[CONFIRMOU]:
+                    confirmados += 1
+        situacao = "-"
+        if riscos[i] >= ALERTA:
+            situacao = f"{confirmados}/{total}"
+        print(f"{BAIRROS[i]:<16}{NIVEIS_RISCO[riscos[i]]:<14}"
+              f"{situacao:>12}")
+
+    em_alerta = bairros_em_alerta(riscos)
+    if len(em_alerta) == 0:
+        print("\n Nenhum bairro em evacuação.")
+        return
+
+    # Lista quem ainda não confirmou nos bairros em evacuação
+    print("\nPendentes (ainda não confirmaram):")
+    alguem_pendente = False
+    for morador in moradores:
+        if morador[BAIRRO] not in em_alerta or morador[CONFIRMOU]:
+            continue   # fora da evacuação ou já confirmou: pula
+        alguem_pendente = True
+        observacao = ""
+        if not morador[TEM_CELULAR]:
+            observacao = " -> sem celular: acionar vigia de bairro"
+        print(f"  - {morador[NOME]} ({BAIRROS[morador[BAIRRO]]})"
+              f"{observacao}")
+    if not alguem_pendente:
+        print("  Todos os moradores cadastrados confirmaram.")
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -597,7 +651,7 @@ def main():
             case 7:
                 confirmar_seguranca(moradores, riscos)
             case 8:
-                print("\nPainel da Defesa Civil")
+                painel_evacuacao(moradores, riscos)
             case 0:
                 executando = False
                 print("\nAté logo! Prevenção é hábito coletivo.")
