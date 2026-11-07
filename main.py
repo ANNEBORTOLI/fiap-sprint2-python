@@ -220,6 +220,22 @@ def escolher_morador(moradores, bairros):
               f"({bairros[morador[BAIRRO]]})")
     opcao = ler_inteiro("Número do morador: ", 1, len(moradores))
     return opcao - 1
+
+
+def ordenar_ranking(itens):
+    """Recebe uma lista de [nome, pontos] e a ordena do maior para o
+    menor número de pontos (ordenação por seleção)."""
+    for i in range(len(itens)):
+        # Procura o item com mais pontos entre as posições i e o fim
+        indice_maior = i
+        for j in range(i + 1, len(itens)):
+            if itens[j][1] > itens[indice_maior][1]:
+                indice_maior = j
+        # Troca o maior encontrado com o item da posição i
+        temporario = itens[i]
+        itens[i] = itens[indice_maior]
+        itens[indice_maior] = temporario
+    return itens
 # =====================================================================
 # REGRAS DE NEGÓCIO
 # =====================================================================
@@ -461,6 +477,46 @@ def registrar_missao(moradores):
     print(f" {morador[NOME]} ganhou +{pontos_missao} pontos. "
           f"Total: {morador[PONTOS]} pontos.")
     return morador[PONTOS]
+
+
+def exibir_ranking(moradores):
+    """Opção 6: mostra o ranking de moradores e o ranking de bairros."""
+    print("\n" + "=" * 62)
+    print(" RANKING COMUNITÁRIO")
+    print("=" * 62)
+
+    # Ranking individual: monta a lista [nome, pontos] e ordena
+    itens = []
+    for morador in moradores:
+        itens.append([morador[NOME], morador[PONTOS]])
+    ranking = ordenar_ranking(itens)
+
+    print("Moradores:")
+    for posicao in range(len(ranking)):
+        print(f"  {posicao + 1:>2}º  {ranking[posicao][0]:<16}"
+              f"{ranking[posicao][1]:>5} pts")
+
+    # Ranking por bairro: soma os pontos dos moradores de cada bairro
+    itens_bairros = []
+    for i in range(len(BAIRROS)):
+        soma = 0
+        quantidade = 0
+        for morador in moradores:
+            if morador[BAIRRO] == i:
+                soma += morador[PONTOS]
+                quantidade += 1
+        if quantidade == 0:
+            continue   # bairro sem moradores cadastrados: fica de fora
+        itens_bairros.append([BAIRROS[i], soma])
+    ranking_bairros = ordenar_ranking(itens_bairros)
+
+    print("\nBairros (soma dos pontos dos moradores):")
+    for posicao in range(len(ranking_bairros)):
+        print(f"  {posicao + 1:>2}º  {ranking_bairros[posicao][0]:<16}"
+              f"{ranking_bairros[posicao][1]:>5} pts")
+
+    if len(ranking_bairros) > 0:
+        print(f"\n Bairro destaque da semana: {ranking_bairros[0][0]}!")
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -501,7 +557,7 @@ def main():
             case 5:
                 registrar_missao(moradores)
             case 6:
-                print("\nRanking comunitário")
+                exibir_ranking(moradores)
             case 7:
                 print("\nConfirmar segurança")
             case 8:
