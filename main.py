@@ -517,6 +517,42 @@ def exibir_ranking(moradores):
 
     if len(ranking_bairros) > 0:
         print(f"\n Bairro destaque da semana: {ranking_bairros[0][0]}!")
+
+
+def confirmar_seguranca(moradores, riscos):
+    """Opção 7: o morador confirma que chegou em segurança ao abrigo.
+    Devolve True se a confirmação foi registrada."""
+    print("\n" + "=" * 62)
+    print(" CONFIRMAR QUE ESTOU EM SEGURANÇA")
+    print("=" * 62)
+
+    em_alerta = bairros_em_alerta(riscos)
+    if len(em_alerta) == 0:
+        print(" Nenhum bairro em ALERTA ou EMERGÊNCIA no momento.")
+        print(" Dica: registre uma leitura forte na opção 1 para simular.")
+        return False
+
+    print("Bairros em evacuação:")
+    for i in em_alerta:
+        print(f"  - {BAIRROS[i]} ({NIVEIS_RISCO[riscos[i]]})")
+
+    print("\nQuem está confirmando?")
+    indice = escolher_morador(moradores, BAIRROS)
+    morador = moradores[indice]
+
+    if morador[BAIRRO] not in em_alerta:
+        print(f"\n O bairro de {morador[NOME]} não está em evacuação. "
+              f"Nada a confirmar.")
+        return False
+    if morador[CONFIRMOU]:
+        print(f"\n {morador[NOME]} já tinha confirmado. Obrigado!")
+        return False
+
+    morador[CONFIRMOU] = True
+    print(f"\n Confirmado: {morador[NOME]} está em segurança em "
+          f"{ABRIGOS[morador[BAIRRO]]}.")
+    print(" O painel da Defesa Civil foi atualizado.")
+    return True
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -559,7 +595,7 @@ def main():
             case 6:
                 exibir_ranking(moradores)
             case 7:
-                print("\nConfirmar segurança")
+                confirmar_seguranca(moradores, riscos)
             case 8:
                 print("\nPainel da Defesa Civil")
             case 0:
