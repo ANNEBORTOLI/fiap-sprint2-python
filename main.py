@@ -366,6 +366,23 @@ def relatorio_chuvas(chuvas):
               f"Atenção redobrada a encostas.")
     if not encontrou:
         print("  Nenhum bairro acima do limite nesta semana.")
+
+
+def consultar_abrigo(niveis_agua, riscos):
+    """Opção 3: o morador escolhe o bairro e vê o abrigo, a distância,
+    a rua a evitar e a situação atual."""
+    print("\n" + "=" * 62)
+    print(" CONSULTAR ABRIGO DO MEU BAIRRO")
+    print("=" * 62)
+    indice = escolher_bairro(BAIRROS)
+
+    risco = riscos[indice]
+    print(f"\n Bairro: {BAIRROS[indice]}")
+    print(f" Situação atual: {NIVEIS_RISCO[risco]} "
+          f"(nível da água: {niveis_agua[indice]} cm)")
+    print(f" Abrigo de referência: {ABRIGOS[indice]}, "
+          f"{DISTANCIAS_ABRIGO_M[indice]} m")
+    print(f" Em dia de chuva forte, evite: {RUAS_EVITAR[indice]}")
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -400,7 +417,7 @@ def main():
             case 2:
                 relatorio_chuvas(chuvas)
             case 3:
-                print("\nConsultar abrigo")
+                consultar_abrigo(niveis_agua, riscos)
             case 4:
                 print("\nCadastrar morador")
             case 5:
