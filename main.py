@@ -199,6 +199,17 @@ def calcular_estatisticas(valores):
             menor = valor
     media = total / len(valores)
     return total, media, maior, menor
+
+
+def buscar_morador(moradores, nome):
+    """Procura um morador pelo nome. Devolve o índice ou -1 se não
+    encontrar."""
+    indice_encontrado = -1
+    for i in range(len(moradores)):
+        if moradores[i][NOME].lower() == nome.lower():
+            indice_encontrado = i
+            break   # achou: não precisa olhar o resto da lista
+    return indice_encontrado
 # =====================================================================
 # REGRAS DE NEGÓCIO
 # =====================================================================
@@ -383,6 +394,37 @@ def consultar_abrigo(niveis_agua, riscos):
     print(f" Abrigo de referência: {ABRIGOS[indice]}, "
           f"{DISTANCIAS_ABRIGO_M[indice]} m")
     print(f" Em dia de chuva forte, evite: {RUAS_EVITAR[indice]}")
+
+
+def cadastrar_morador(moradores):
+    """Opção 4: cadastra um novo morador na lista."""
+    print("\n" + "=" * 62)
+    print(" CADASTRAR MORADOR")
+    print("=" * 62)
+
+    # Repete até receber um nome que ainda não está cadastrado
+    while True:
+        nome = ler_texto("Nome do morador: ", 2)
+        if buscar_morador(moradores, nome) == -1:
+            break
+        print("  Já existe um morador com esse nome. "
+              "Use nome e sobrenome.")
+
+    print("Bairro onde mora:")
+    indice_bairro = escolher_bairro(BAIRROS)
+    tem_celular = ler_sim_nao("Tem smartphone para receber alertas? (S/N): ")
+
+    # Novo morador: começa com 0 pontos e sem confirmação de segurança
+    moradores.append([nome, indice_bairro, 0, tem_celular, False])
+
+    if tem_celular:
+        canal = "push e SMS"
+    else:
+        canal = "ligação de voz e vigia de bairro"
+
+    print(f"\n {nome} cadastrado(a) em {BAIRROS[indice_bairro]}.")
+    print(f" Canal de alerta: {canal}.")
+    print(f" Total de moradores cadastrados: {len(moradores)}")
 # =====================================================================
 # MENU PRINCIPAL
 # =====================================================================
@@ -419,7 +461,7 @@ def main():
             case 3:
                 consultar_abrigo(niveis_agua, riscos)
             case 4:
-                print("\nCadastrar morador")
+                cadastrar_morador(moradores)
             case 5:
                 print("\nRegistrar missão")
             case 6:
